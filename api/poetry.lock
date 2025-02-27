@@ -9114,15 +9114,15 @@ all = ["numpy"]
 
 [[package]]
 name = "readabilipy"
-version = "0.2.0"
+version = "0.3.0"
 description = "Python wrapper for Mozilla's Readability.js"
 optional = false
 python-versions = ">=3.6.0"
 groups = ["main"]
 markers = "python_version == \"3.11\" or python_version >= \"3.12\""
 files = [
-    {file = "readabilipy-0.2.0-py3-none-any.whl", hash = "sha256:0050853cd6ab012ac75bb4d8f06427feb7dc32054da65060da44654d049802d0"},
-    {file = "readabilipy-0.2.0.tar.gz", hash = "sha256:098bf347b19f362042fb6c08864ad776588bf844ac2261fb230f7f9c250fdae5"},
+    {file = "readabilipy-0.3.0-py3-none-any.whl", hash = "sha256:d106da0fad11d5fdfcde21f5c5385556bfa8ff0258483037d39ea6b1d6db3943"},
+    {file = "readabilipy-0.3.0.tar.gz", hash = "sha256:e13313771216953935ac031db4234bdb9725413534bfb3c19dbd6caab0887ae0"},
 ]
 
 [package.dependencies]
@@ -12383,4 +12383,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "d704c6a5267261ab1614070faa0c0276acd4ff1c2692bface293823d3e3fb801"
+content-hash = "a4e5cd5077b38493ee0c2d48fa42a8f0fa247e171a493c7857eefd9bb8d43966"
