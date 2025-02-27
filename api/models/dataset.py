@@ -119,6 +119,20 @@ class Dataset(db.Model):  # type: ignore[name-defined]
             )
             .scalar()
         )
+    
+    @property
+    def check_document_count(self):
+        result = (
+            db.session.query(Document.id)
+            .filter(
+                Document.dataset_id == self.id,
+                Document.indexing_status == "completed",
+                Document.enabled == True,
+                Document.archived == False,
+            )
+            .first()
+        )
+        return 1 if result else 0
 
     @property
     def available_segment_count(self):
@@ -131,6 +145,19 @@ class Dataset(db.Model):  # type: ignore[name-defined]
             )
             .scalar()
         )
+    
+    @property
+    def check_segment_count(self):
+        result = (
+            db.session.query(DocumentSegment.id)
+            .filter(
+                DocumentSegment.dataset_id == self.id,
+                DocumentSegment.status == "completed",
+                DocumentSegment.enabled == True,
+            )
+            .first()
+        )
+        return 1 if result else 0
 
     @property
     def word_count(self):
