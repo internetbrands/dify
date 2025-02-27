@@ -844,6 +844,17 @@ class AccountConfig(BaseSettings):
         default=5,
     )
 
+class PrometheusConfig(BaseSettings):
+    HISTOGRAM_BUCKETS_1MIN: list[float] = Field(
+        description="The buckets of Prometheus histogram under 1 minute",
+        default=[0.1, 0.2, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50, 60],
+    )
+
+    HISTOGRAM_BUCKETS_5MIN: list[float] = Field(
+        description="The buckets of Prometheus histogram under 5 minute",
+        default=[0.1, 0.2, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50, 60, 120, 180, 300],
+    )
+
 
 class FeatureConfig(
     # place the configs in alphabet order
@@ -875,6 +886,7 @@ class FeatureConfig(
     WorkspaceConfig,
     LoginConfig,
     AccountConfig,
+    PrometheusConfig,
     # hosted services config
     HostedServiceConfig,
     CeleryBeatConfig,

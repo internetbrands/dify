@@ -491,6 +491,9 @@ class AdvancedChatAppGenerateTaskPipeline:
                         trace_manager=trace_manager,
                     )
 
+                    self._workflow_time_it(
+                        is_success=True, graph_runtime_state=graph_runtime_state, workflow_run=workflow_run
+                    )
                     workflow_finish_resp = self._workflow_cycle_manager._workflow_finish_to_stream_response(
                         session=session, task_id=self._application_generate_entity.task_id, workflow_run=workflow_run
                     )

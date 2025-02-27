@@ -37,6 +37,15 @@ from core.app.entities.task_entities import (
     WorkflowFinishStreamResponse,
     WorkflowStartStreamResponse,
 )
+from core.app.task_pipeline import (
+    app_input_tokens,
+    app_output_tokens,
+    app_request,
+    app_request_failed,
+    app_request_latency,
+    app_total_tokens,
+)
+
 from core.file import FILE_MODEL_IDENTITY, File
 from core.model_runtime.utils.encoders import jsonable_encoder
 from core.ops.entities.trace_entity import TraceTaskName
@@ -60,7 +69,6 @@ from models.workflow import (
 )
 
 from .exc import WorkflowRunNotFoundError
-
 
 class WorkflowCycleManage:
     def __init__(

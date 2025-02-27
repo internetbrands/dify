@@ -43,6 +43,16 @@ from core.app.entities.task_entities import (
     MessageEndStreamResponse,
     StreamResponse,
 )
+
+from core.app.task_pipeline import (
+    app_input_tokens,
+    app_output_tokens,
+    app_request,
+    app_request_failed,
+    app_request_latency,
+    app_total_tokens,
+)
+
 from core.app.task_pipeline.based_generate_task_pipeline import BasedGenerateTaskPipeline
 from core.app.task_pipeline.message_cycle_manage import MessageCycleManage
 from core.model_manager import ModelInstance

@@ -14,6 +14,26 @@ from core.tools.entities.tool_entities import (
     ToolProviderType,
 )
 
+from prometheus_client import Counter, Histogram
+from configs import dify_config
+
+
+tool_request_total_counter = Counter(
+    name="tool_request_total_counter", documentation="The total count of tool requests", labelnames=["provider", "tool"]
+)
+tool_request_failed_counter = Counter(
+    name="tool_request_failed_counter",
+    documentation="The failed count of tool requests",
+    labelnames=["provider", "tool"],
+)
+tool_request_latency = Histogram(
+    name="tool_request_latency",
+    documentation="The latency of tool requests",
+    unit="seconds",
+    labelnames=["provider", "tool"],
+    buckets=dify_config.HISTOGRAM_BUCKETS_5MIN,
+)
+
 
 class Tool(ABC):
     """
@@ -68,6 +88,16 @@ class Tool(ABC):
             app_id=app_id,
             message_id=message_id,
         )
+        with tool_request_latency.labels(provider=self.identity.provider, tool=self.identity.name).time():
+            tool_request_total_counter.labels(provider=self.identity.provider, tool=self.identity.name).inc()
+            try:
+                result = self._invoke(
+                    user_id=user_id,
+                    tool_parameters=tool_parameters,
+                )
+            except Exception as e:
+                tool_request_failed_counter.labels(provider=self.identity.provider, tool=self.identity.name).inc()
+                raise e
 
         if isinstance(result, ToolInvokeMessage):
 

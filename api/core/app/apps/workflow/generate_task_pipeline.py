@@ -446,7 +446,9 @@ class WorkflowAppGenerateTaskPipeline:
                         conversation_id=None,
                         trace_manager=trace_manager,
                     )
-
+                    self._workflow_time_it(
+                        is_success=True, graph_runtime_state=graph_runtime_state, workflow_run=workflow_run
+                    )
                     # save workflow app log
                     self._save_workflow_app_log(session=session, workflow_run=workflow_run)
 

@@ -23,9 +23,29 @@ from core.model_runtime.model_providers.__base.tts_model import TTSModel
 from core.provider_manager import ProviderManager
 from extensions.ext_redis import redis_client
 from models.provider import ProviderType
+from prometheus_client import Counter, Histogram
 
 logger = logging.getLogger(__name__)
 
+model_request_total_counter = Counter(
+    name="model_request_total_counter",
+    documentation="The total count of model requests",
+    labelnames=["model_type", "provider", "model", "method"],
+)
+model_request_failed_counter = Counter(
+    name="model_request_failed_counter",
+    documentation="The failed count of model requests",
+    labelnames=["model_type", "provider", "model", "method"],
+)
+
+model_request_latency = Histogram(
+    name="model_request_latency",
+    documentation="The latency of model requests. For the LLM model, it just indicate "
+    "the TTFT (a.k.a. Time To First Token).",
+    unit="seconds",
+    labelnames=["model_type", "provider", "model", "method"],
+    buckets=dify_config.HISTOGRAM_BUCKETS_1MIN,
+)
 
 class ModelInstance:
     """
