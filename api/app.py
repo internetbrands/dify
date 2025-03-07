@@ -1,5 +1,8 @@
 import os
 import sys
+from flask import Flask, request
+from prometheus_flask_exporter import PrometheusMetrics
+
 
 
 def is_db_command():
@@ -8,11 +11,21 @@ def is_db_command():
     return False
 
 
+def add_route_path_counter():
+    metrics.register_default(
+        metrics.counter(
+            'by_path_counter', 'Request count by request paths',
+            labels={'path': lambda: request.path}
+        )
+    )
+
+
 # create app
 if is_db_command():
     from app_factory import create_migrations_app
 
     app = create_migrations_app()
+    metrics = PrometheusMetrics(app)
 else:
     # It seems that JetBrains Python debugger does not work well with gevent,
     # so we need to disable gevent in debug mode.
@@ -35,7 +48,9 @@ else:
     from app_factory import create_app
 
     app = create_app()
+    metrics = PrometheusMetrics(app)
     celery = app.extensions["celery"]
+    add_route_path_counter()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
