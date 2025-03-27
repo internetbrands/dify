@@ -24,6 +24,9 @@ class Keyword:
                 from core.rag.datasource.keyword.jieba.jieba import Jieba
 
                 return Jieba
+            case KeyWordType.SCISPACY:
+                from core.rag.datasource.keyword.scispacy.scispacy import SciSpacy
+                return SciSpacy
             case _:
                 raise ValueError(f"Keyword store {keyword_type} is not supported.")
 
