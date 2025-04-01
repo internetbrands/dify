@@ -11,6 +11,8 @@ class SciSpacyKeywordTableHandler:
 
     def extract_keywords(self, text: str, max_keywords_per_chunk: Optional[int] = 10) -> set[str]:
         """Extract keywords with scispacy."""
+        if max_keywords_per_chunk is None:
+            max_keywords_per_chunk = 100
         linked_scores = {}
         linker = self.nlp.get_pipe("scispacy_linker")
         doc = self.nlp(text)
@@ -43,6 +45,6 @@ class SciSpacyKeywordTableHandler:
                             ent_score = 1.0
                             #    print(f"'{ent_text_lower}' not found in vocab")
                             linked_scores[linked_name] = linked_scores.get(linked_name, 0) + ent_score
-        top_linked = sorted(linked_scores.items(), key=lambda x: x[1], reverse=True)[:10]
+        top_linked = sorted(linked_scores.items(), key=lambda x: x[1], reverse=True)[:max_keywords_per_chunk]
         keywords = [item[0] for item in top_linked]
         return set(keywords)

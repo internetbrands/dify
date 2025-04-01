@@ -7,6 +7,7 @@ import numpy as np
 from core.model_manager import ModelManager
 from core.model_runtime.entities.model_entities import ModelType
 from core.rag.datasource.keyword.jieba.jieba_keyword_table_handler import JiebaKeywordTableHandler
+from core.rag.datasource.keyword.scispacy.scispacy_keyword_table_handler import SciSpacyKeywordTableHandler
 from core.rag.embedding.cached_embedding import CacheEmbedding
 from core.rag.models.document import Document
 from core.rag.rerank.entity.weight import VectorSetting, Weights
@@ -71,7 +72,7 @@ class WeightRerankRunner(BaseRerankRunner):
 
         :return:
         """
-        keyword_table_handler = JiebaKeywordTableHandler()
+        keyword_table_handler = SciSpacyKeywordTableHandler()
         query_keywords = keyword_table_handler.extract_keywords(query, None)
         documents_keywords = []
         for document in documents:
