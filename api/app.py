@@ -19,13 +19,12 @@ def add_route_path_counter():
         )
     )
 
-
 # create app
 if is_db_command():
     from app_factory import create_migrations_app
 
     app = create_migrations_app()
-    metrics = PrometheusMetrics(app)
+    metrics = PrometheusMetrics(app, group_by="url_rule")
 else:
     # It seems that JetBrains Python debugger does not work well with gevent,
     # so we need to disable gevent in debug mode.
@@ -48,9 +47,8 @@ else:
     from app_factory import create_app
 
     app = create_app()
-    metrics = PrometheusMetrics(app)
+    metrics = PrometheusMetrics(app, group_by="url_rule")
     celery = app.extensions["celery"]
-    add_route_path_counter()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)
