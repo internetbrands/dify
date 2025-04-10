@@ -25,6 +25,7 @@ class PGVectorConfig(BaseModel):
     database: str
     min_connection: int
     max_connection: int
+    tsvector_lang: str = 'english'
 
     @model_validator(mode="before")
     @classmethod
@@ -58,8 +59,13 @@ CREATE TABLE IF NOT EXISTS {table_name} (
 """
 
 SQL_CREATE_INDEX = """
-CREATE INDEX IF NOT EXISTS embedding_cosine_v1_idx ON {table_name} 
+CREATE INDEX IF NOT EXISTS {table_name}_embedding_cosine_v1_idx ON {table_name} 
 USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
+"""
+
+SQL_CREATE_TSVECTOR_INDEX = """
+CREATE INDEX IF NOT EXISTS {table_name}_tsvector_idx ON {table_name} 
+USING GIN (to_tsvector('{tsvector_lang}', text));
 """
 
 
@@ -68,6 +74,7 @@ class PGVector(BaseVector):
         super().__init__(collection_name)
         self.pool = self._create_connection_pool(config)
         self.table_name = f"embedding_{collection_name}"
+        self.tsvector_lang = config.tsvector_lang
 
     def get_type(self) -> str:
         return VectorType.PGVECTOR
@@ -177,9 +184,9 @@ class PGVector(BaseVector):
 
         with self._get_cursor() as cur:
             cur.execute(
-                f"""SELECT meta, text, ts_rank(to_tsvector(coalesce(text, '')), plainto_tsquery(%s)) AS score
+                f"""SELECT meta, text, ts_rank(to_tsvector('{self.tsvector_lang}',coalesce(text, '')), plainto_tsquery(%s)) AS score
                 FROM {self.table_name}
-                WHERE to_tsvector(text) @@ plainto_tsquery(%s)
+                WHERE to_tsvector('{self.tsvector_lang}',text) @@ plainto_tsquery(%s)
                 ORDER BY score DESC
                 LIMIT {top_k}""",
                 # f"'{query}'" is required in order to account for whitespace in query
@@ -214,6 +221,7 @@ class PGVector(BaseVector):
                 # ref: https://github.com/pgvector/pgvector?tab=readme-ov-file#indexing
                 if dimension <= 2000:
                     cur.execute(SQL_CREATE_INDEX.format(table_name=self.table_name))
+                cur.execute(SQL_CREATE_TSVECTOR_INDEX.format(table_name=self.table_name, tsvector_lang=self.tsvector_lang))
             redis_client.set(collection_exist_cache_key, 1, ex=3600)
 
 
