@@ -59,12 +59,12 @@ CREATE TABLE IF NOT EXISTS {table_name} (
 """
 
 SQL_CREATE_INDEX = """
-CREATE INDEX IF NOT EXISTS dataset_{table_name[-16:]}_embedding_cosine_v1_idx ON {table_name} 
+CREATE INDEX IF NOT EXISTS dataset_{short_table_name}_embedding_cosine_v1_idx ON {table_name} 
 USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
 """
 
 SQL_CREATE_TSVECTOR_INDEX = """
-CREATE INDEX IF NOT EXISTS dataset_{table_name[-16:]}_text_tsvector_idx ON {table_name} 
+CREATE INDEX IF NOT EXISTS dataset_{short_table_name}_text_tsvector_idx ON {table_name} 
 USING GIN (to_tsvector('{tsvector_lang}', text));
 """
 
@@ -220,8 +220,8 @@ class PGVector(BaseVector):
                 # PG hnsw index only support 2000 dimension or less
                 # ref: https://github.com/pgvector/pgvector?tab=readme-ov-file#indexing
                 if dimension <= 2000:
-                    cur.execute(SQL_CREATE_INDEX.format(table_name=self.table_name))
-                cur.execute(SQL_CREATE_TSVECTOR_INDEX.format(table_name=self.table_name, tsvector_lang=self.tsvector_lang))
+                    cur.execute(SQL_CREATE_INDEX.format(table_name=self.table_name, short_table_name=self.table_name[-16:]))
+                cur.execute(SQL_CREATE_TSVECTOR_INDEX.format(table_name=self.table_name, short_table_name=self.table_name[-16:], tsvector_lang=self.tsvector_lang))
             redis_client.set(collection_exist_cache_key, 1, ex=3600)
 
 
