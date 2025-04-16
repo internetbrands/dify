@@ -229,6 +229,7 @@ class PGVector(BaseVector):
                     f"""SELECT meta, text, ts_rank(to_tsvector('{self.tsvector_lang}',coalesce(text, '')), plainto_tsquery(%s)) AS score
                     FROM {self.table_name}
                     WHERE to_tsvector('{self.tsvector_lang}',text) @@ plainto_tsquery(%s)
+                    {where_clause}
                     ORDER BY score DESC
                     LIMIT {top_k}""",
                     # f"'{query}'" is required in order to account for whitespace in query
