@@ -196,7 +196,7 @@ def compact_generate_response(
     response: Union[Mapping[str, Any], RateLimitGenerator, Generator[str, None, None]],
 ) -> Response:
     if isinstance(response, dict):
-        return Response(response=json.dumps(response), status=200, mimetype="application/json")
+        return Response(response=json.dumps(response, ensure_ascii=False), status=200, mimetype="application/json; charset=utf-8")
     else:
 
         def generate() -> Generator:
