@@ -28,6 +28,7 @@ class PGVectorConfig(BaseModel):
     min_connection: int
     max_connection: int
     pg_bigm: bool = False
+    tsvector_lang: str = 'english'
 
     @model_validator(mode="before")
     @classmethod
@@ -61,8 +62,13 @@ CREATE TABLE IF NOT EXISTS {table_name} (
 """
 
 SQL_CREATE_INDEX = """
-CREATE INDEX IF NOT EXISTS embedding_cosine_v1_idx ON {table_name}
+CREATE INDEX IF NOT EXISTS dataset_{short_table_name}_embedding_cosine_v1_idx ON {table_name} 
 USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
+"""
+
+SQL_CREATE_TSVECTOR_INDEX = """
+CREATE INDEX IF NOT EXISTS dataset_{short_table_name}_text_tsvector_idx ON {table_name} 
+USING GIN (to_tsvector('{tsvector_lang}', text));
 """
 
 SQL_CREATE_INDEX_PG_BIGM = """
@@ -77,6 +83,7 @@ class PGVector(BaseVector):
         self.pool = self._create_connection_pool(config)
         self.table_name = f"embedding_{collection_name}"
         self.pg_bigm = config.pg_bigm
+        self.tsvector_lang = config.tsvector_lang
 
     def get_type(self) -> str:
         return VectorType.PGVECTOR
@@ -219,9 +226,9 @@ class PGVector(BaseVector):
                 )
             else:
                 cur.execute(
-                    f"""SELECT meta, text, ts_rank(to_tsvector(coalesce(text, '')), plainto_tsquery(%s)) AS score
+                    f"""SELECT meta, text, ts_rank(to_tsvector('{self.tsvector_lang}',coalesce(text, '')), plainto_tsquery(%s)) AS score
                     FROM {self.table_name}
-                    WHERE to_tsvector(text) @@ plainto_tsquery(%s)
+                    WHERE to_tsvector('{self.tsvector_lang}',text) @@ plainto_tsquery(%s)
                     {where_clause}
                     ORDER BY score DESC
                     LIMIT {top_k}""",
@@ -256,10 +263,12 @@ class PGVector(BaseVector):
                 # PG hnsw index only support 2000 dimension or less
                 # ref: https://github.com/pgvector/pgvector?tab=readme-ov-file#indexing
                 if dimension <= 2000:
-                    cur.execute(SQL_CREATE_INDEX.format(table_name=self.table_name))
+                    cur.execute(SQL_CREATE_INDEX.format(table_name=self.table_name, short_table_name=self.table_name[-16:]))
                 if self.pg_bigm:
                     cur.execute("CREATE EXTENSION IF NOT EXISTS pg_bigm")
                     cur.execute(SQL_CREATE_INDEX_PG_BIGM.format(table_name=self.table_name))
+                else:
+                    cur.execute(SQL_CREATE_TSVECTOR_INDEX.format(table_name=self.table_name, short_table_name=self.table_name[-16:], tsvector_lang=self.tsvector_lang))
             redis_client.set(collection_exist_cache_key, 1, ex=3600)
 
 
