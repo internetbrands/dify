@@ -84,7 +84,7 @@ dependencies = [
     "weave~=0.51.34",
     "yarl~=1.18.3",
     "webvtt-py~=0.5.1",
-    "wandb~=0.19.11",
+    "wandb~=0.20.1",
     "prometheus-flask-exporter==0.23.2",
 ]
 # Before adding new dependency, consider place it in
