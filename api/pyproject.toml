@@ -35,7 +35,7 @@ dependencies = [
     "langsmith~=0.1.77",
     "mailchimp-transactional~=1.0.50",
     "markdown~=3.5.1",
-    "newrelic==7.16.0.178",
+    "newrelic>=9,<10",
     "numpy~=1.26.4",
     "oci~=2.135.1",
     "openai~=1.61.0",

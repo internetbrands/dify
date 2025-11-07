@@ -1,13 +1,9 @@
 import os
 import sys
 
-# --- New Relic manual initialization (testing only) ---
 import newrelic.agent
-# Choose environment section from newrelic.ini (qa/prod/etc)
 env = os.environ.get("ENV", "qa")
-# If newrelic.ini is in the same folder as this file:
 newrelic.agent.initialize("newrelic.ini", env)
-# --- end New Relic block ---
 
 from flask import Flask, request
 from prometheus_flask_exporter import PrometheusMetrics
