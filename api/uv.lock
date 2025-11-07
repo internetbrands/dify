@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.11, <3.13"
 resolution-markers = [
     "python_full_version >= '3.12.4' and platform_python_implementation != 'PyPy' and sys_platform == 'linux'",
@@ -1209,6 +1209,7 @@ dependencies = [
     { name = "langsmith" },
     { name = "mailchimp-transactional" },
     { name = "markdown" },
+    { name = "newrelic" },
     { name = "numpy" },
     { name = "oci" },
     { name = "openai" },
@@ -1383,6 +1384,7 @@ requires-dist = [
     { name = "langsmith", specifier = "~=0.1.77" },
     { name = "mailchimp-transactional", specifier = "~=1.0.50" },
     { name = "markdown", specifier = "~=3.5.1" },
+    { name = "newrelic", specifier = "==7.16.0.178" },
     { name = "numpy", specifier = "~=1.26.4" },
     { name = "oci", specifier = "~=2.135.1" },
     { name = "openai", specifier = "~=1.61.0" },
@@ -3223,6 +3225,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/83/f8/51569ac65d696c8ec
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/c4/c2971a3ba4c6103a3d10c4b0f24f461ddc027f0f09763220cf35ca1401b3/nest_asyncio-1.6.0-py3-none-any.whl", hash = "sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c", size = 5195, upload-time = "2024-01-21T14:25:17.223Z" },
 ]
+
+[[package]]
+name = "newrelic"
+version = "7.16.0.178"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b8/13/5c87086af3e52c191dc36d8d5ee4579172979d26d0728a283a54f85a4d3e/newrelic-7.16.0.178.tar.gz", hash = "sha256:b31b38e04436cd583eaebf178cf50a7f2c0501f6a0cce72f1dc08eaec64d20da", size = 879925, upload-time = "2022-07-21T17:36:52.146Z" }
 
 [[package]]
 name = "nltk"
