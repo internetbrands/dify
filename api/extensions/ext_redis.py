@@ -4,6 +4,7 @@ import redis
 from redis.cluster import ClusterNode, RedisCluster
 from redis.connection import Connection, SSLConnection
 from redis.sentinel import Sentinel
+import newrelic.agent  # <-- added
 
 from configs import dify_config
 from dify_app import DifyApp
@@ -40,7 +41,34 @@ class RedisClientWrapper:
     def __getattr__(self, item):
         if self._client is None:
             raise RuntimeError("Redis client is not initialized. Call init_app first.")
-        return getattr(self._client, item)
+        attr = getattr(self._client, item)
+
+        # --- BEGIN minimal New Relic visibility shim ---
+        # Wrap the most common hot-path redis operations so their time shows up
+        # under "Application code in (Datastore/operation/Redis/...)"
+        _NR_WRAP = {
+            "get",
+            "set",
+            "mget",
+            "mset",
+            "hget",
+            "hset",
+            "hgetall",
+            "hmget",
+            "hmset",
+            "exists",
+            "expire",
+            "delete",
+            "pipeline",
+        }
+        if callable(attr) and item in _NR_WRAP:
+            def _wrapped(*args, **kwargs):
+                with newrelic.agent.function_trace(name=f"redis.{item}"):
+                    return attr(*args, **kwargs)
+            return _wrapped
+        # --- END minimal New Relic visibility shim ---
+
+        return attr
 
 
 redis_client = RedisClientWrapper()
