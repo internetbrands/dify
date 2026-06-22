@@ -8,6 +8,7 @@ export LC_ALL=${LC_ALL:-en_US.UTF-8}
 export PYTHONIOENCODING=${PYTHONIOENCODING:-utf-8}
 
 # New Relic APM support. The agent wraps the application processes when a license key is provided.
+export NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-0cab12510ab84d1052f518699c6cbdac162514f2}
 export NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-dify-api}
 export NEW_RELIC_LOG_LEVEL=${NEW_RELIC_LOG_LEVEL:-info}
 export NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=${NEW_RELIC_DISTRIBUTED_TRACING_ENABLED:-true}
