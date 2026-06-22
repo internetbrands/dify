@@ -1409,6 +1409,7 @@ dependencies = [
     { name = "litellm" },
     { name = "markdown" },
     { name = "mlflow-skinny" },
+    { name = "newrelic" },
     { name = "numpy" },
     { name = "openpyxl" },
     { name = "opentelemetry-api" },
@@ -1607,6 +1608,7 @@ requires-dist = [
     { name = "litellm", specifier = "==1.77.1" },
     { name = "markdown", specifier = "~=3.5.1" },
     { name = "mlflow-skinny", specifier = ">=3.0.0" },
+    { name = "newrelic", specifier = ">=8.0.0,<9.0.0" },
     { name = "numpy", specifier = "~=1.26.4" },
     { name = "openpyxl", specifier = "~=3.1.5" },
     { name = "opentelemetry-api", specifier = "==1.27.0" },
@@ -3652,6 +3654,16 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e8/fc/7b6fd4d22c8c4dc5704430140d8b3f520531d4fe7328b8f8d03f5a7950e8/networkx-3.6.tar.gz", hash = "sha256:285276002ad1f7f7da0f7b42f004bcba70d381e936559166363707fdad3d72ad", size = 2511464, upload-time = "2025-11-24T03:03:47.158Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/07/c7/d64168da60332c17d24c0d2f08bdf3987e8d1ae9d84b5bbd0eec2eb26a55/networkx-3.6-py3-none-any.whl", hash = "sha256:cdb395b105806062473d3be36458d8f1459a4e4b98e236a66c3a48996e07684f", size = 2063713, upload-time = "2025-11-24T03:03:45.21Z" },
+]
+
+[[package]]
+name = "newrelic"
+version = "8.11.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/13/5d/6a8158c52486befa5994047bf6ffce78d478d33753258768761497e1615f/newrelic-8.11.0.tar.gz", hash = "sha256:59cb3da7e5dd526e7f8696a5ed704d06c43bc2d4da840897534e9a51da7266eb", size = 951533, upload-time = "2023-08-23T21:53:38.421Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0f/bc/8daf69620740f8e719c0a992ae15294c746e7b9706540f84d7a8e60402d6/newrelic-8.11.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7a649068a0cf5c4a7ba0f9739e52f1ad9d2882aafcfe3361fd264cbb975c5318", size = 764818, upload-time = "2023-08-23T21:53:26.554Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/20/27d352bd372ce3187953ca04456482c01c561a1064ef17bd7387482cdba0/newrelic-8.11.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1c9463dd1b1407ade27a4c7ebb2137b77c51e23498cec7ee2671fff3fd33fd73", size = 763342, upload-time = "2023-08-23T21:53:28.495Z" },
 ]
 
 [[package]]

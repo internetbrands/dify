@@ -7,6 +7,12 @@ export LANG=${LANG:-en_US.UTF-8}
 export LC_ALL=${LC_ALL:-en_US.UTF-8}
 export PYTHONIOENCODING=${PYTHONIOENCODING:-utf-8}
 
+# New Relic APM support. The agent wraps the application processes when a license key is provided.
+export NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-dify-api}
+export NEW_RELIC_LOG_LEVEL=${NEW_RELIC_LOG_LEVEL:-info}
+export NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=${NEW_RELIC_DISTRIBUTED_TRACING_ENABLED:-true}
+export NEW_RELIC_USE_GEVENT=${NEW_RELIC_USE_GEVENT:-true}
+
 if [[ "${MIGRATION_ENABLED}" == "true" ]]; then
   echo "Running migrations"
   flask upgrade-db
@@ -62,13 +68,24 @@ if [[ "${MODE}" == "worker" ]]; then
   WORKER_POOL="${CELERY_WORKER_POOL:-${CELERY_WORKER_CLASS:-gevent}}"
   echo "Starting Celery worker with queues: ${DEFAULT_QUEUES}"
 
-  exec celery -A celery_entrypoint.celery worker -P ${WORKER_POOL} $CONCURRENCY_OPTION \
-    --max-tasks-per-child ${MAX_TASKS_PER_CHILD:-50} --loglevel ${LOG_LEVEL:-INFO} \
-    -Q ${DEFAULT_QUEUES} \
-    --prefetch-multiplier=${CELERY_PREFETCH_MULTIPLIER:-1}
+  if [[ -n "${NEW_RELIC_LICENSE_KEY:-}" ]]; then
+    exec newrelic-admin run-program celery -A celery_entrypoint.celery worker -P ${WORKER_POOL} $CONCURRENCY_OPTION \
+      --max-tasks-per-child ${MAX_TASKS_PER_CHILD:-50} --loglevel ${LOG_LEVEL:-INFO} \
+      -Q ${DEFAULT_QUEUES} \
+      --prefetch-multiplier=${CELERY_PREFETCH_MULTIPLIER:-1}
+  else
+    exec celery -A celery_entrypoint.celery worker -P ${WORKER_POOL} $CONCURRENCY_OPTION \
+      --max-tasks-per-child ${MAX_TASKS_PER_CHILD:-50} --loglevel ${LOG_LEVEL:-INFO} \
+      -Q ${DEFAULT_QUEUES} \
+      --prefetch-multiplier=${CELERY_PREFETCH_MULTIPLIER:-1}
+  fi
 
 elif [[ "${MODE}" == "beat" ]]; then
-  exec celery -A app.celery beat --loglevel ${LOG_LEVEL:-INFO}
+  if [[ -n "${NEW_RELIC_LICENSE_KEY:-}" ]]; then
+    exec newrelic-admin run-program celery -A app.celery beat --loglevel ${LOG_LEVEL:-INFO}
+  else
+    exec celery -A app.celery beat --loglevel ${LOG_LEVEL:-INFO}
+  fi
 
 elif [[ "${MODE}" == "job" ]]; then
   # Job mode: Run a one-time Flask command and exit
@@ -118,14 +135,28 @@ elif [[ "${MODE}" == "job" ]]; then
 
 else
   if [[ "${DEBUG}" == "true" ]]; then
-    exec flask run --host=${DIFY_BIND_ADDRESS:-0.0.0.0} --port=${DIFY_PORT:-5001} --debug
+    if [[ -n "${NEW_RELIC_LICENSE_KEY:-}" ]]; then
+      exec newrelic-admin run-program flask run --host=${DIFY_BIND_ADDRESS:-0.0.0.0} --port=${DIFY_PORT:-5001} --debug
+    else
+      exec flask run --host=${DIFY_BIND_ADDRESS:-0.0.0.0} --port=${DIFY_PORT:-5001} --debug
+    fi
   else
-    exec gunicorn \
-      --bind "${DIFY_BIND_ADDRESS:-0.0.0.0}:${DIFY_PORT:-5001}" \
-      --workers ${SERVER_WORKER_AMOUNT:-1} \
-      --worker-class ${SERVER_WORKER_CLASS:-gevent} \
-      --worker-connections ${SERVER_WORKER_CONNECTIONS:-10} \
-      --timeout ${GUNICORN_TIMEOUT:-200} \
-      app:app
+    if [[ -n "${NEW_RELIC_LICENSE_KEY:-}" ]]; then
+      exec newrelic-admin run-program gunicorn \
+        --bind "${DIFY_BIND_ADDRESS:-0.0.0.0}:${DIFY_PORT:-5001}" \
+        --workers ${SERVER_WORKER_AMOUNT:-1} \
+        --worker-class ${SERVER_WORKER_CLASS:-gevent} \
+        --worker-connections ${SERVER_WORKER_CONNECTIONS:-10} \
+        --timeout ${GUNICORN_TIMEOUT:-200} \
+        app:app
+    else
+      exec gunicorn \
+        --bind "${DIFY_BIND_ADDRESS:-0.0.0.0}:${DIFY_PORT:-5001}" \
+        --workers ${SERVER_WORKER_AMOUNT:-1} \
+        --worker-class ${SERVER_WORKER_CLASS:-gevent} \
+        --worker-connections ${SERVER_WORKER_CONNECTIONS:-10} \
+        --timeout ${GUNICORN_TIMEOUT:-200} \
+        app:app
+    fi
   fi
 fi
